@@ -7,11 +7,12 @@ class FullPost extends Component {
     state ={
         loadedPost:null
     }
-    componentDidUpdate(){//componentDIdUpdate内でsetStateを実行するときにはinfiniteLoopに注意
-        if(this.props.id) {
+    componentDidMount(){//componentDIdUpdate内でsetStateを実行するときにはinfiniteLoopに注意
+        console.log(this.props);//Routeコンポーネントによりmatch.params.idでurlクエリパラメータが取得できる
+        if(this.props.match.params.id) {
             if(!this.state.loadedPost || (this.state.loadedPost && this.state.loadedPost.id !== this.props.id)){
                 //stateが更新され、同じidの場合はhttpリクエストが実行されないようにする
-                axios.get('/posts/'+ this.props.id)
+                axios.get('/posts/'+ this.props.match.params.id)
                 .then(response=>{
                     //console.log(response);
                     this.setState({loadedPost:response.data});
