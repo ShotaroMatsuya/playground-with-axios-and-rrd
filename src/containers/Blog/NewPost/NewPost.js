@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './NewPost.css';
+import {Redirect} from 'react-router-dom';
 
 class NewPost extends Component {
     state = {
         title: '',
         content: '',
-        author: 'Shotaro'
+        author: 'Shotaro',
+        submitted:false
     }
     componentDidMount(){
         console.log(this.props);
@@ -20,12 +22,21 @@ class NewPost extends Component {
         axios.post('/posts',post)
             .then(response=>{
                 console.log(response);
+                // this.setState({submitted:true});
+                // this.props.history.push('/posts');//state変化を行わずに手軽にリダイレクトできる(これだとブラウザの戻るボタンでNewPostコンポーネントに戻れてしまう)
+                // 戻るボタンを機能させないためには<Redirect/>かhistory.replaceを用いると良い
+                this.props.history.replace('/posts');
             });
     }
 
     render () {
+        let redirect = null;
+        if(this.state.submitted){
+            redirect = <Redirect to="/posts" />;
+        }
         return (
             <div className="NewPost">
+                {redirect}
                 <h1>Add a Post</h1>
                 <label>Title</label>
                 <input type="text" value={this.state.title} onChange={(event) => this.setState({title: event.target.value})} />

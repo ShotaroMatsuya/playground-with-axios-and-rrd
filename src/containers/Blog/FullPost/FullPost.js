@@ -7,10 +7,24 @@ class FullPost extends Component {
     state ={
         loadedPost:null
     }
-    componentDidMount(){//componentDIdUpdate内でsetStateを実行するときにはinfiniteLoopに注意
+    componentDidMount(){
         console.log(this.props);//Routeコンポーネントによりmatch.params.idでurlクエリパラメータが取得できる
+        this.loadData();
+
+    }
+    componentDidUpdate(){//componentDIdUpdate内でsetStateを実行するときにはinfiniteLoopに注意
+        this.loadData();
+        
+    }
+    deletePostHandler=()=>{
+        axios.delete('/posts/' + this.props.match.params.id)
+            .then(response=>{
+                console.log(response);
+            });
+    }
+    loadData(){
         if(this.props.match.params.id) {
-            if(!this.state.loadedPost || (this.state.loadedPost && this.state.loadedPost.id !== this.props.id)){
+            if(!this.state.loadedPost || (this.state.loadedPost && this.state.loadedPost.id !== +this.props.match.params.id)){//queryParameterはstring型である点に注意
                 //stateが更新され、同じidの場合はhttpリクエストが実行されないようにする
                 axios.get('/posts/'+ this.props.match.params.id)
                 .then(response=>{
@@ -21,15 +35,9 @@ class FullPost extends Component {
 
         }
     }
-    deletePostHandler=()=>{
-        axios.delete('/posts/' + this.props.id)
-            .then(response=>{
-                console.log(response);
-            });
-    }
     render () {
         let post = <p style={{textAlign:'center'}}>Please select a Post!</p>;
-        if(this.props.id){ //loadedPostはcomponentDidUpdate時に取得されるため最初のrendering時には表示すべきでない
+        if(this.props.match.params.id){ //loadedPostはcomponentDidUpdate時に取得されるため最初のrendering時には表示すべきでない
             post = <p style={{textAlign:'center'}}>Loading...!</p>;
         }
         if(this.state.loadedPost){//loadedPostはcomponentDidUpdate時に取得されるため、最初のrendering時にはnull
